@@ -1,277 +1,145 @@
+---
+title: SQL Repair Env
+emoji: 🗄️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # SQL Repair Environment
 
-An OpenEnv reinforcement learning environment for training AI agents to repair broken SQL queries and clean dirty data — a real-world task performed by millions of data engineers and analysts every day.
+An [OpenEnv](https://huggingface.co/openenv) environment for training AI agents to repair broken SQL queries and clean dirty data.
 
-[![OpenEnv](https://img.shields.io/badge/OpenEnv-compatible-blue)](https://github.com/meta-pytorch/OpenEnv)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+## Overview
 
----
-
-## Motivation
-
-Every production data system has broken SQL: a missing comma in a SELECT, a JOIN on the wrong key, a GROUP BY that aggregates incorrectly, or an ETL pipeline that loaded TEXT instead of REAL. Fixing these errors requires multi-step reasoning — inspecting schemas, previewing data, forming hypotheses, and iterating on queries.
-
-This environment provides a sandboxed, episodic interface where an LLM agent can practise exactly this skill with dense reward signals and deterministic programmatic graders.
-
----
+Agents interact with an isolated **SQLite** database via tool-style actions and receive **dense partial-credit rewards**. Three tasks span easy → medium → hard difficulty, covering real data-engineering failure modes: syntax errors, broken JOINs, dirty ETL data, type mismatches, and FK violations.
 
 ## Environment Description
 
-The agent interacts with an **in-memory SQLite database** that is freshly initialised on every `reset()` call. The database contains injected faults — syntax errors, wrong JOIN keys, dirty data — that the agent must diagnose and fix.
+### Action Space
 
-Each step the agent chooses one of five actions:
+`SQLRepairAction` with three fields:
 
-| Action type | Required fields | What it does |
+| Field | Type | Description |
 |---|---|---|
-| `list_tables` | — | Returns all table names in the DB |
-| `query_schema` | `target_table` | Returns the DDL (`CREATE TABLE …`) for a table |
-| `inspect_data` | `target_table` | Returns first 8 rows of a table |
-| `submit_query` | `sql_query` | Executes a SQL string; returns rows or error |
-| `run_test` | — | Runs the hidden correctness test; shows sub-goal breakdown |
+| `action_type` | `str` | One of: `submit_query`, `query_schema`, `inspect_data`, `list_tables`, `run_test` |
+| `sql_query` | `str \| None` | SQL to execute. Required for `submit_query`. |
+| `target_table` | `str \| None` | Table name. Required for `query_schema` / `inspect_data`. |
 
----
+### Observation Space
 
-## Action Space
+`SQLRepairObservation` with fields:
 
-```python
-@dataclass
-class SQLRepairAction(Action):
-    action_type:  str            # Required. One of the five types above.
-    sql_query:    Optional[str]  # Required for submit_query.
-    target_table: Optional[str]  # Required for query_schema / inspect_data.
+| Field | Type | Description |
+|---|---|---|
+| `query_result` | `list[dict]` | Rows returned by last SELECT |
+| `error_message` | `str` | Non-empty if last action raised an error |
+| `schema_info` | `str` | DDL after `query_schema` |
+| `rows_affected` | `int` | Count of rows changed by DML |
+| `partial_score` | `float` | Current grader score 0.0–1.0 |
+| `hint` | `str` | Progressive hint after stuck steps |
+| `step_count` | `int` | Steps taken in this episode |
+| `tables` | `list[str]` | Table names after `list_tables` |
+| `task_id` | `str` | Active task |
+| `task_description` | `str` | Human-readable goal |
+| `broken_query` | `str` | Original broken SQL |
+
+### Reward Function
+
+Dense, potential-based:
 ```
-
-Example action (JSON):
-```json
-{"action_type": "submit_query", "sql_query": "SELECT name, salary FROM employees WHERE dept='Engineering' ORDER BY salary DESC"}
+R(t) = Φ(s_t) - Φ(s_{t-1}) - 0.02 (step penalty)
 ```
-
----
-
-## Observation Space
-
-```python
-@dataclass
-class SQLRepairObservation(Observation):
-    query_result:     List[Dict]  # Rows returned by last SELECT
-    error_message:    str         # Non-empty if last action raised an error
-    schema_info:      str         # DDL string (after query_schema)
-    rows_affected:    int         # Rows changed by INSERT/UPDATE/DELETE
-    partial_score:    float       # Current grader score 0.0–1.0
-    hint:             str         # Progressive hint (appears after 5/10/15 stuck steps)
-    step_count:       int         # Steps taken in this episode
-    tables:           List[str]   # Table names (after list_tables)
-    task_id:          str         # Active task: easy | medium | hard
-    task_description: str         # Human-readable goal
-    broken_query:     str         # The defective query shown at episode start
-    done:             bool        # True when episode ends
-    reward:           float       # Dense step reward
-```
-
----
+- **+1.0** terminal bonus on perfect score (1.0)
+- **−0.5** penalty for destructive SQL (DROP/TRUNCATE/DELETE without WHERE)
+- **−0.15** penalty for repeated syntax errors (≥3 in a row)
 
 ## Tasks
 
-### Easy — Syntax Error Fix
-**Difficulty:** Easy | **Max steps:** 20
-
-A salary report query fails because of a missing comma between column names in the SELECT clause.
-
-```sql
--- Broken:
-SELECT name salary FROM employees WHERE dept = 'Engineering' ORDER BY salary DESC
-
--- Fixed:
-SELECT name, salary FROM employees WHERE dept = 'Engineering' ORDER BY salary DESC
-```
-
-**Grader sub-goals:**
-
-| Sub-goal | Weight |
-|---|---|
-| Query executes without error | 0.25 |
-| Correct columns returned | 0.25 |
-| Correct row count | 0.25 |
-| Correct values | 0.25 |
-
----
+### Easy — Missing Comma
+Fix a single syntax error (missing comma between column names) in an HR salary report query.
+- **Score 1.0**: correct columns, correct row count, correct values
 
 ### Medium — Broken JOIN + Wrong GROUP BY
-**Difficulty:** Medium | **Max steps:** 20
+Fix a sales dashboard query with a wrong JOIN key (`o.product_name` → `o.product_id`) and incorrect `GROUP BY` column (`o.product_id` → `p.category`).
+- **Score 1.0**: schema inspected, correct JOIN, correct aggregation
 
-A sales dashboard query joins on a non-existent column and groups by the wrong field. The agent must inspect the schema of three tables to identify and fix both bugs.
+### Hard — Dirty ETL Data
+The ETL loaded dirty data: duplicate transactions, invalid FK references (customer_id=99), and `amount` stored as TEXT. Write a query that de-duplicates, type-casts, excludes orphans, and returns correct per-customer totals.
+- **Score 1.0**: deduplication, type cast, FK exclusion, correct values
 
-```sql
--- Broken:
-SELECT p.category, SUM(p.unit_price * o.quantity) AS revenue
-FROM orders o
-JOIN products p ON o.product_name = p.product_name   -- wrong: o has no product_name
-GROUP BY o.product_id                                   -- wrong: should be p.category
-ORDER BY revenue DESC
+## Setup
 
--- Fixed:
-SELECT p.category, SUM(p.unit_price * o.quantity) AS revenue
-FROM orders o JOIN products p ON o.product_id = p.product_id
-GROUP BY p.category ORDER BY revenue DESC
-```
-
-**Grader sub-goals:**
-
-| Sub-goal | Weight |
-|---|---|
-| Schema inspected (query_schema called) | 0.15 |
-| Query executes without error | 0.20 |
-| Correct columns returned | 0.15 |
-| Correct row count | 0.20 |
-| Correct values (exact revenue figures) | 0.30 |
-
----
-
-### Hard — Dirty ETL Data Cleaning + Analytical Query
-**Difficulty:** Hard | **Max steps:** 20
-
-A nightly ETL job loaded transaction data with three problems: duplicate rows, orphan foreign keys (customer_id=99 doesn't exist), and the `amount` column stored as TEXT instead of REAL. The agent must detect all three issues and write a query that produces the correct per-customer spend totals.
-
-**Grader sub-goals:**
-
-| Sub-goal | Weight |
-|---|---|
-| Duplicates detected (inspect_data reveals them) | 0.15 |
-| Type cast present (`CAST(amount AS REAL)` in SQL) | 0.15 |
-| Invalid FK excluded (no customer_id=99 in result) | 0.10 |
-| Correct row count | 0.20 |
-| Correct values (exact spend totals) | 0.40 |
-
----
-
-## Reward Function
-
-Dense, potential-based reward shaping:
-
-```
-R(t) = Φ(s_t) − Φ(s_{t-1}) − 0.02
-```
-
-Where `Φ(s)` is the weighted sum of achieved sub-goals (the grader score). Addional adjustments:
-
-- **+1.0** terminal bonus when `partial_score == 1.0`
-- **−0.50** for destructive SQL (DROP TABLE, TRUNCATE)
-- **−0.15** for repeating SQL errors 3+ times in a row
-
----
-
-## Baseline Scores
-
-Measured using `gpt-4o-mini` at temperature 0, max 18 steps per task:
-
-| Task | Score | Notes |
-|---|---|---|
-| easy | 0.85 | Solves reliably; occasional off-by-one on ORDER BY |
-| medium | 0.52 | Usually fixes JOIN key; sometimes misses GROUP BY |
-| hard | 0.24 | Rarely finds all three data issues in one episode |
-
-Run the baseline yourself:
-```bash
-OPENAI_API_KEY=sk-... BASE_URL=http://localhost:7860 python baseline_inference.py
-```
-
----
-
-## Setup & Usage
-
-### Local development (no Docker)
+### Local Development
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sql-repair-env
+git clone https://huggingface.co/spaces/YOUR_USERNAME/sql-repair-env
 cd sql-repair-env
+python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
-# Run the server
-uvicorn server.app:app --reload --port 7860
+# Run tests
+pytest test_environment.py -v
 
-# In another terminal, call reset
-curl -X POST http://localhost:7860/reset -H "Content-Type: application/json" -d '{"task_id": "easy"}'
-
-# List tasks
-curl http://localhost:7860/tasks
-
-# Step
-curl -X POST http://localhost:7860/step \
-  -H "Content-Type: application/json" \
-  -d '{"action_type": "list_tables"}'
+# Start server
+uvicorn server.app:app --port 7860
 ```
 
 ### Docker
 
 ```bash
-docker build -t sql-repair-env -f server/Dockerfile .
-docker run -p 7860:7860 sql-repair-env
+docker build -t sql-repair-env .
+docker run -p 7860:7860 \
+  -e HF_TOKEN="your_api_key" \
+  -e MODEL_NAME="gemini-2.5-flash" \
+  sql-repair-env
 
-# Health check
+# Verify
 curl http://localhost:7860/health
+curl -X POST http://localhost:7860/reset -H "Content-Type: application/json" -d '{}'
 ```
 
-### Python client
-
-```python
-from sql_repair_env import SQLRepairEnv, SQLRepairAction
-
-with SQLRepairEnv(base_url="https://YOUR_SPACE.hf.space").sync() as env:
-    obs = env.reset(task_id="medium")
-    print(obs.observation.hint)
-
-    result = env.step(SQLRepairAction(action_type="list_tables"))
-    print(result.observation.tables)
-```
-
-### Run tests
+### Running the Baseline Inference Script
 
 ```bash
-pytest test_environment.py -v
+# Free tier — Google AI Studio (get key at aistudio.google.com)
+export API_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai/"
+export MODEL_NAME="gemini-2.5-flash"
+export HF_TOKEN="AIza..."
+export BASE_URL="http://localhost:7860"
+
+python inference.py
 ```
 
----
+Output:
+```json
+{"easy": 0.85, "medium": 0.52, "hard": 0.24, "metadata": {...}}
+```
 
-## Custom Endpoints
+## Environment Variables
 
-| Endpoint | Method | Description |
+| Variable | Description | Default |
 |---|---|---|
-| `/health` | GET | Liveness probe |
-| `/tasks` | GET | List all tasks with action schemas |
-| `/grader` | POST | Score the current episode |
-| `/baseline` | POST | Run baseline inference; returns scores JSON |
+| `API_BASE_URL` | LLM endpoint (OpenAI-compatible) | Gemini endpoint |
+| `MODEL_NAME` | Model identifier | `gemini-2.5-flash` |
+| `HF_TOKEN` | API key (Gemini/OpenAI/Groq/HF) | — |
+| `BASE_URL` | Environment server URL | `http://localhost:7860` |
+| `PORT` | Server port | `7860` |
 
----
+## API Endpoints
 
-## Project Structure
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/reset` | Start new episode. Body: `{"task_id": "easy"}` |
+| `POST` | `/step` | Execute action |
+| `GET` | `/state` | Episode metadata |
+| `GET` | `/health` | Liveness probe |
+| `GET` | `/tasks` | All tasks + action schemas |
+| `POST` | `/grader` | Score for current episode |
+| `POST` | `/baseline` | Run inference.py, return scores |
 
-```
-sql_repair_env/
-├── __init__.py              # Package exports
-├── models.py                # SQLRepairAction, SQLRepairObservation (Pydantic)
-├── client.py                # SQLRepairEnv (EnvClient subclass)
-├── baseline_inference.py    # OpenAI agent loop → JSON scores
-├── test_environment.py      # 20+ unit tests
-├── openenv.yaml             # Environment manifest
-├── pyproject.toml           # Package metadata
-└── server/
-    ├── __init__.py
-    ├── sql_repair_environment.py  # Core Environment logic
-    ├── app.py                     # FastAPI + custom endpoints
-    ├── tasks.py                   # Task definitions
-    ├── grader.py                  # Deterministic scorer
-    ├── requirements.txt
-    └── Dockerfile
-```
+## License
 
----
-
-## Deploy to Hugging Face Spaces
-
-```bash
-pip install openenv-core
-openenv push --repo-id YOUR_USERNAME/sql-repair-env
-```
-
-Then submit your Space URL in the hackathon dashboard.
+MIT
