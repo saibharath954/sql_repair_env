@@ -15,21 +15,28 @@ Reward design  (potential-based, dense):
 
 import re
 import sqlite3
+import sys
+import os
 import uuid
 from typing import Any, Dict, List, Optional
 
 from openenv.core.env_server.interfaces import Environment
 from openenv.core.env_server.types import State
 
-# Adjust import path for standalone execution vs. package execution
+# Resolve imports whether run as package or directly (uvicorn server.app:app)
+# Add repo root to sys.path so 'models' is always importable
+_repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
+from models import SQLRepairAction, SQLRepairObservation, SQLRepairState
+
 try:
-    from models import SQLRepairAction, SQLRepairObservation, SQLRepairState
     from server.tasks import TASKS
     from server.grader import compute_potential, compute_score
 except ModuleNotFoundError:
-    from ..models import SQLRepairAction, SQLRepairObservation, SQLRepairState
-    from .tasks import TASKS
-    from .grader import compute_potential, compute_score
+    from tasks import TASKS
+    from grader import compute_potential, compute_score
 
 MAX_STEPS = 20
 STEP_PENALTY = 0.02
@@ -47,7 +54,7 @@ class SQLRepairEnvironment(Environment):
         self._conn: Optional[sqlite3.Connection] = None
         self._task_id: str = "easy"
         self._state: SQLRepairState = SQLRepairState(
-            episode_id=str(uuid.uuid4()), step_count=0, task_id="easy"
+            episode_id=str(uuid.uuid4()), task_id="easy", step_count=0
         )
         self._achieved_flags: Dict[str, bool] = {}
         self._prev_potential: float = 0.0
@@ -79,8 +86,8 @@ class SQLRepairEnvironment(Environment):
         self._task_id = task_id
         self._state = SQLRepairState(
             episode_id=str(uuid.uuid4()),
-            step_count=0,
             task_id=task_id,
+            step_count=0,
         )
         self._achieved_flags = {k: False for k, _ in self._get_subgoals()}
         self._prev_potential = 0.0
@@ -288,7 +295,10 @@ class SQLRepairEnvironment(Environment):
     # ─── helpers ──────────────────────────────────────────────────────────────
 
     def _get_subgoals(self):
-        from server.grader import SUBGOALS
+        try:
+            from server.grader import SUBGOALS
+        except ModuleNotFoundError:
+            from grader import SUBGOALS
         return SUBGOALS.get(self._task_id, [])
 
     def get_achieved_flags(self) -> Dict[str, bool]:

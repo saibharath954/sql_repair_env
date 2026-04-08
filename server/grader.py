@@ -74,7 +74,10 @@ def compute_score(
     Returns:
         (score, updated_flags)
     """
-    from server.tasks import TASKS  # local import to avoid circulars
+    try:
+        from server.tasks import TASKS
+    except ModuleNotFoundError:
+        from tasks import TASKS
 
     task = TASKS[task_id]
     expected = task["expected_rows"]
