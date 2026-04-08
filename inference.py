@@ -101,7 +101,9 @@ Respond ONLY with a single valid JSON object. No markdown, no extra text."""
 
 def _post(endpoint: str, payload: dict) -> dict:
     resp = requests.post(f"{BASE_URL}{endpoint}", json=payload, timeout=30)
-    resp.raise_for_status()
+    if not resp.ok:
+        # This will expose exactly which field Pydantic is rejecting!
+        raise Exception(f"HTTP {resp.status_code}: {resp.text}")
     return resp.json()
 
 
@@ -152,34 +154,24 @@ def run_task(client: OpenAI, task_id: str) -> float:
         if obs.get("done"):
             break
 
-        # 1. BYPASS FREE TIER RATE LIMIT (5 RPM)
-        print("[DEBUG] Sleeping 15s to respect Gemini API rate limits...", flush=True)
-        time.sleep(15)
-
-        # 2. LLM CALL WITH BUILT-IN RETRY
-        for attempt in range(3):
-            try:
-                response = client.chat.completions.create(
-                    model=MODEL_NAME,
-                    messages=messages,
-                    response_format={"type": "json_object"},
-                    temperature=0.0,
-                    max_tokens=512,
-                )
-                last_raw = response.choices[0].message.content or "{}"
-                action_dict = json.loads(last_raw)
-                break
-            except json.JSONDecodeError:
-                action_dict = {"action_type": "list_tables"}
-                last_raw = json.dumps(action_dict)
-                break
-            except Exception as exc:
-                print(f"[DEBUG] LLM Error (attempt {attempt+1}): {exc}", flush=True)
-                if attempt == 2:
-                    action_dict = {"action_type": "list_tables"}
-                    last_raw = json.dumps(action_dict)
-                else:
-                    time.sleep(20) # Wait for server to recover before retry
+        # LLM call (OpenAI client — endpoint set via API_BASE_URL)
+        try:
+            response = client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=0.0,
+                max_tokens=512,
+            )
+            last_raw = response.choices[0].message.content or "{}"
+            action_dict = json.loads(last_raw)
+        except json.JSONDecodeError:
+            action_dict = {"action_type": "list_tables"}
+            last_raw = json.dumps(action_dict)
+        except Exception as exc:
+            print(f"[DEBUG] LLM call failed: {exc}", flush=True)
+            action_dict = {"action_type": "list_tables"}
+            last_raw = json.dumps(action_dict)
 
         action_type  = action_dict.get("action_type", "list_tables")
         sql_query    = action_dict.get("sql_query") or None
@@ -191,14 +183,15 @@ def run_task(client: OpenAI, task_id: str) -> float:
         reward = 0.0
         done = False
         try:
-            # 3. BYPASS 422 ERROR BY STRIPPING NULL VALUES
-            payload = {"action_type": action_type}
+            # 3. CONSTRUCT THE ACTION PAYLOAD
+            action_payload = {"action_type": action_type}
             if sql_query is not None:
-                payload["sql_query"] = sql_query
+                action_payload["sql_query"] = sql_query
             if target_table is not None:
-                payload["target_table"] = target_table
+                action_payload["target_table"] = target_table
 
-            step_resp = _post("/step", payload)
+            # 4. WRAP IN THE "action" KEY REQUIRED BY FASTAPI/OPENENV
+            step_resp = _post("/step", {"action": action_payload})
             obs    = step_resp.get("observation", step_resp)
             reward = step_resp.get("reward", 0.0)
             done   = step_resp.get("done", obs.get("done", False))
