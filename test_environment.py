@@ -162,10 +162,13 @@ class TestStep:
 class TestMedium:
     def test_correct_medium_query_scores_1(self, env):
         env.reset(task_id="medium")
+        
+        # --- Simulate the agent inspecting the schema ---
+        env.step(SQLRepairAction(action_type="query_schema", target_table="orders"))
+        
         correct_sql = TASKS["medium"]["action_schema"]["sql_query"]
         obs = env.step(SQLRepairAction(action_type="submit_query", sql_query=correct_sql))
         assert obs.partial_score == 1.0
-
     def test_medium_broken_query_scores_0(self, env):
         env.reset(task_id="medium")
         broken_sql = TASKS["medium"]["broken_query"]

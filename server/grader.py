@@ -134,8 +134,8 @@ def compute_score(
 
     # ── compute weighted total ─────────────────────────────────────────────
     score = sum(
-        weight for label, weight in SUBGOALS[task_id]
-        if achieved_flags.get(label, False)
+        (weight for label, weight in SUBGOALS[task_id] if achieved_flags.get(label, False)),
+        0.0  # Force it to be a float!
     )
     return round(min(score, 1.0), 4), achieved_flags
 
@@ -143,7 +143,7 @@ def compute_score(
 def compute_potential(achieved_flags: Dict[str, bool], task_id: str) -> float:
     """Return the potential Φ(s) used for dense reward shaping."""
     score = sum(
-        weight for label, weight in SUBGOALS[task_id]
-        if achieved_flags.get(label, False)
+        (weight for label, weight in SUBGOALS[task_id] if achieved_flags.get(label, False)),
+        0.0  # Force it to be a float!
     )
     return round(min(score, 1.0), 4)

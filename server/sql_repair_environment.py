@@ -210,6 +210,12 @@ class SQLRepairEnvironment(Environment):
         sql = sql.strip()
         if not sql:
             return SQLRepairObservation(error_message="sql_query is required for submit_query.")
+
+        # --- Auto-detect CAST for the hard task ---
+        if self._task_id == "hard" and re.search(r"(?i)\bCAST\b|\bREAL\b|\*\s*1\.0", sql):
+            self.mark_type_cast_present()
+        # ----------------------------------------------------------
+
         try:
             cursor = self._conn.execute(sql)
             self._conn.commit()
