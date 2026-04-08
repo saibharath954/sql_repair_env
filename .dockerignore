@@ -1,0 +1,18 @@
+# Keep Docker image lean
+.git/
+.gitignore
+*.md
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+outputs/
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+test_environment.py
