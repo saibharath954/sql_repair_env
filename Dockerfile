@@ -30,5 +30,4 @@ EXPOSE 7860
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
 
-ENV ENABLE_WEB_INTERFACE=true
 CMD ["sh", "-c", "uvicorn server.app:app --host 0.0.0.0 --port ${PORT} --workers 1"]
