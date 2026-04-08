@@ -1,0 +1,57 @@
+# OpenEnv Environment Manifest
+# Validated by: openenv validate
+# Deployed by:  openenv push
+
+name: sql-repair-env
+version: 0.1.0
+description: >
+  A real-world RL environment for training AI agents to repair broken SQL queries
+  and clean dirty data. Agents interact with an isolated SQLite database via
+  tool-style actions (submit_query, query_schema, inspect_data) and receive
+  dense, partial-credit rewards. Three tasks span easy → medium → hard difficulty.
+
+# Python import paths — must match the actual module structure exactly
+entrypoint: server.app:app
+action_space: models.SQLRepairAction
+observation_space: models.SQLRepairObservation
+state_space: models.SQLRepairState
+
+# Hugging Face Spaces tags — 'openenv' is required for hub discoverability
+tags:
+  - openenv
+  - sql
+  - data-quality
+  - data-engineering
+  - reinforcement-learning
+
+# Runtime
+runtime:
+  python: "3.11"
+  port: 7860
+
+# Task registry (informational — graders are implemented in server/grader.py)
+tasks:
+  - id: easy
+    difficulty: easy
+    description: "Fix a single syntax error in a SELECT query (missing comma)."
+  - id: medium
+    difficulty: medium
+    description: "Repair a broken JOIN key and incorrect GROUP BY column across 3 tables."
+  - id: hard
+    difficulty: hard
+    description: "Clean dirty ETL data (duplicates, NULL FK, type mismatch) then write a correct analytical query."
+
+# Custom endpoints exposed beyond the standard OpenEnv spec
+custom_endpoints:
+  - path: /tasks
+    method: GET
+    description: "List all tasks with descriptions and action schemas."
+  - path: /grader
+    method: POST
+    description: "Return grader score for the current episode."
+  - path: /baseline
+    method: POST
+    description: "Run baseline inference script and return scores for all tasks."
+  - path: /health
+    method: GET
+    description: "Liveness probe."

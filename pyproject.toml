@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "sql-repair-env"
+version = "0.1.0"
+description = "OpenEnv environment for SQL query repair and data quality — Meta × HuggingFace Hackathon 2026"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["openenv", "reinforcement-learning", "sql", "data-quality", "llm"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "openenv-core>=0.2.1",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.0.0",
+    "requests>=2.31.0",
+    "openai>=1.30.0",
+]
+
+[project.scripts]
+# Required by openenv validate
+server = "server.app:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27.0", "pytest-asyncio>=0.23.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sql_repair_env*"]
+
+[project.urls]
+Homepage = "https://huggingface.co/spaces/openenv/sql-repair-env"
+Repository = "https://github.com/YOUR_USERNAME/sql-repair-env"
