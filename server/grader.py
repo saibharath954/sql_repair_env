@@ -133,17 +133,25 @@ def compute_score(
             achieved_flags["correct_values"] = True
 
     # ── compute weighted total ─────────────────────────────────────────────
-    score = sum(
+    raw_score = sum(
         (weight for label, weight in SUBGOALS[task_id] if achieved_flags.get(label, False)),
         0.0  # Force it to be a float!
     )
-    return round(min(score, 1.0), 4), achieved_flags
+    
+    # HACKATHON FIX: Clamp score strictly between 0 and 1
+    safe_score = max(0.001, min(raw_score, 0.999))
+    
+    return round(safe_score, 4), achieved_flags
 
 
 def compute_potential(achieved_flags: Dict[str, bool], task_id: str) -> float:
     """Return the potential Φ(s) used for dense reward shaping."""
-    score = sum(
+    raw_score = sum(
         (weight for label, weight in SUBGOALS[task_id] if achieved_flags.get(label, False)),
         0.0  # Force it to be a float!
     )
-    return round(min(score, 1.0), 4)
+    
+    # FIX: Clamp score strictly between 0 and 1
+    safe_score = max(0.001, min(raw_score, 0.999))
+    
+    return round(safe_score, 4)

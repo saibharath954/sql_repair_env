@@ -145,8 +145,8 @@ class SQLRepairEnvironment(Environment):
 
         # ── terminal conditions ───────────────────────────────────────────
         done = False
-        if score >= 1.0:
-            reward += 1.0  # full-solve bonus
+        if score >= 0.999:  # CHANGED FROM 1.0 TO MATCH NEW CLAMPED MAX
+            reward += 1.0   # full-solve bonus
             done = True
         elif step >= MAX_STEPS:
             done = True
