@@ -17,6 +17,7 @@ import re
 import sqlite3
 import sys
 import os
+import threading
 import uuid
 from typing import Any, Dict, List, Optional
 
@@ -52,6 +53,7 @@ class SQLRepairEnvironment(Environment):
     """Sandboxed SQLite-based SQL repair environment with stochastic fault injection."""
 
     def __init__(self):
+        self._lock = threading.Lock()
         self._conn: Optional[sqlite3.Connection] = None
         self._task_id: str = "easy"
         self._state: SQLRepairState = SQLRepairState(
@@ -72,6 +74,11 @@ class SQLRepairEnvironment(Environment):
 
     def reset(self, task_id: str = "easy", seed: Optional[int] = None) -> SQLRepairObservation:
         """Start a fresh episode. Tears down old DB, injects task-specific faults."""
+        with self._lock:
+            return self._reset_unlocked(task_id=task_id, seed=seed)
+
+    def _reset_unlocked(self, task_id: str = "easy", seed: Optional[int] = None) -> SQLRepairObservation:
+        """Internal reset implementation (must be called under self._lock)."""
         if task_id not in TASKS:
             task_id = "easy"
 
@@ -137,6 +144,11 @@ class SQLRepairEnvironment(Environment):
 
     def step(self, action: SQLRepairAction) -> SQLRepairObservation:
         """Execute one agent action and return the resulting observation with reward."""
+        with self._lock:
+            return self._step_unlocked(action)
+
+    def _step_unlocked(self, action: SQLRepairAction) -> SQLRepairObservation:
+        """Internal step implementation (must be called under self._lock)."""
         self._state.step_count += 1
         step = self._state.step_count
 
@@ -335,13 +347,14 @@ class SQLRepairEnvironment(Environment):
         return dict(self._achieved_flags)
 
     def get_current_score(self) -> float:
-        score, _ = compute_score(
-            conn=self._conn,
-            task_id=self._task_id,
-            last_result=[],
-            achieved_flags=dict(self._achieved_flags),
-        )
-        return score
+        with self._lock:
+            score, _ = compute_score(
+                conn=self._conn,
+                task_id=self._task_id,
+                last_result=[],
+                achieved_flags=dict(self._achieved_flags),
+            )
+            return score
 
     def mark_type_cast_present(self):
         """Called when CAST is detected in submitted SQL (hard task)."""
