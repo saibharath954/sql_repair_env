@@ -46,10 +46,21 @@ def _rows_equal(actual: list, expected: list, columns: list) -> bool:
     """Compare two result sets regardless of internal dict ordering."""
     if len(actual) != len(expected):
         return False
+        
+    # 1. FAST-FAIL: Ensure all expected columns actually exist in the agent's results
+    # This prevents the KeyError: 'total_spend' and KeyError: 'revenue'
+    if actual and not all(c in actual[0] for c in columns):
+        return False
+
     def normalise(row):
         return tuple(round(float(row[c]), 2) if isinstance(row[c], float) else row[c]
                      for c in columns)
-    return sorted(normalise(r) for r in actual) == sorted(normalise(r) for r in expected)
+                     
+    # 2. SAFETY NET: Catch any rogue type-casting errors (e.g., if a weird string can't be float()'d)
+    try:
+        return sorted(normalise(r) for r in actual) == sorted(normalise(r) for r in expected)
+    except Exception:
+        return False
 
 
 def _cols_present(actual: list, expected_columns: list) -> bool:
