@@ -82,8 +82,12 @@ class SQLRepairEnvironment(Environment):
             except Exception:
                 pass
 
-        # Fresh in-memory SQLite — perfectly isolated per episode
-        self._conn = sqlite3.connect(":memory:")
+        # Fresh in-memory SQLite — perfectly isolated per episode.
+        # check_same_thread=False is required because openenv's HTTP server runs
+        # reset()/step() inside a ThreadPoolExecutor; SQLite's default same-thread
+        # guard raises ProgrammingError when the connection is reused across threads.
+        # The GIL + our single-episode-at-a-time design make this safe.
+        self._conn = sqlite3.connect(":memory:", check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
 
         task = TASKS[task_id]
