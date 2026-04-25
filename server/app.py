@@ -2,13 +2,16 @@
 FastAPI application for the SQL Repair Environment.
 
 Routes:
-  POST /reset     — start episode (accepts empty body {}, defaults to task_id='easy')
-  POST /step      — execute action
-  GET  /state     — episode metadata
-  GET  /health    — liveness probe (HF Spaces ping target)
-  GET  /tasks     — task list + action schemas  [required by hackathon]
-  POST /grader    — grader score for current episode  [required by hackathon]
-  POST /baseline  — run inference.py, return scores  [required by hackathon]
+  POST /reset            — start episode (task_id='auto' for curriculum-driven selection)
+  POST /step             — execute action
+  GET  /state            — episode metadata
+  GET  /health           — liveness probe (HF Spaces ping target)
+  GET  /tasks            — task list + action schemas  [required by hackathon]
+  POST /grader           — grader score for current episode  [required by hackathon]
+  POST /baseline         — run inference.py, return scores  [required by hackathon]
+  GET  /faults           — reveal injected fault types (post-episode analysis)
+  GET  /curriculum       — current difficulty level and progression stats
+  POST /curriculum/reset — reset curriculum to Novice (testing only)
 """
 
 import json
@@ -29,12 +32,14 @@ if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
 from models import SQLRepairAction, SQLRepairObservation
-from server.sql_repair_environment import SQLRepairEnvironment
+from server.environment import SQLRepairEnvironment
 from server.tasks import TASKS
 from server.grader import SUBGOALS
+from server.curriculum import CurriculumManager, LEVEL_NAMES
 
 # ── create app ────────────────────────────────────────────────────────────────
 env = SQLRepairEnvironment()
+curriculum = CurriculumManager()
 app: FastAPI = create_fastapi_app(lambda: env, SQLRepairAction, SQLRepairObservation)
 
 
@@ -65,14 +70,26 @@ class ResetRequest(BaseModel):
 async def reset_env(req: ResetRequest = ResetRequest()):
     """
     Reset the environment. Posting an empty body {} defaults to task_id='easy'.
+    Pass task_id='auto' to let the curriculum manager choose task and difficulty.
     The pre-validation script posts {} — this MUST return HTTP 200.
     """
-    obs = env.reset(task_id=req.task_id, seed=req.seed)
+    suggestion = {}
+    task_id = req.task_id
+
+    if not task_id or task_id == "auto":
+        suggestion = curriculum.suggest_task()
+        task_id = suggestion["task_id"]
+        env.set_difficulty_level(suggestion["difficulty_level"])
+
+    obs = env.reset(task_id=task_id, seed=req.seed)
     return {
         "observation": _obs_dict(obs),
         "reward": 0.0,
         "done": False,
         "episode_id": env.state.episode_id,
+        "injected_fault_count": env.state.injected_fault_count,
+        "difficulty_level": env.state.difficulty_level,
+        "level_name": suggestion.get("level_name", LEVEL_NAMES.get(env.state.difficulty_level, "Senior")),
     }
 
 
@@ -81,12 +98,26 @@ async def reset_env(req: ResetRequest = ResetRequest()):
 async def step_env(action: SQLRepairAction):
     """Execute one action and return the resulting observation with reward."""
     obs = env.step(action)
-    return {
+
+    # Record completed episodes for curriculum tracking
+    promotion_info = {}
+    if obs.done:
+        promotion_info = curriculum.record_episode(
+            task_id=env.state.task_id,
+            score=obs.partial_score,
+            steps_taken=env.state.step_count,
+            injected_fault_count=env.state.injected_fault_count,
+        )
+
+    result = {
         "observation": _obs_dict(obs),
         "reward":      obs.reward,
         "done":        obs.done,
         "episode_id":  env.state.episode_id,
     }
+    if promotion_info:
+        result["curriculum"] = promotion_info
+    return result
 
 
 # ─── /state ───────────────────────────────────────────────────────────────────
@@ -94,14 +125,46 @@ async def step_env(action: SQLRepairAction):
 async def get_state():
     """Return current episode metadata."""
     s = env.state
-    return {"episode_id": s.episode_id, "step_count": s.step_count, "task_id": s.task_id}
+    return {
+        "episode_id": s.episode_id,
+        "step_count": s.step_count,
+        "task_id": s.task_id,
+        "injected_fault_count": s.injected_fault_count,
+        "difficulty_level": s.difficulty_level,
+    }
 
 
 # ─── /health ──────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
     """Liveness probe — HF Spaces automated ping / pre-validation target."""
-    return {"status": "ok", "environment": "sql-repair-env", "version": "0.1.0"}
+    return {"status": "ok", "environment": "sql-repair-env", "version": "0.2.0"}
+
+
+# ─── /faults ──────────────────────────────────────────────────────────────────
+@app.get("/faults")
+async def reveal_faults():
+    """Reveal injected fault types — only meaningful after episode ends."""
+    return {
+        "injected_faults": env._injected_faults,
+        "fault_count": len(env._injected_faults),
+        "episode_done": env.state.step_count >= 20,
+        "note": "Fault names revealed for post-episode analysis and curriculum tracking.",
+    }
+
+
+# ─── /curriculum ──────────────────────────────────────────────────────────────
+@app.get("/curriculum")
+async def get_curriculum():
+    """Return current curriculum difficulty level and progression stats."""
+    return curriculum.get_stats()
+
+
+@app.post("/curriculum/reset")
+async def reset_curriculum():
+    """Reset curriculum to level 0. For testing only."""
+    curriculum.reset()
+    return {"message": "Curriculum reset to Novice level"}
 
 
 # ─── /tasks ───────────────────────────────────────────────────────────────────
@@ -183,7 +246,6 @@ async def run_baseline(force: bool = False):
         if _baseline_cache is not None and not force:
             return _baseline_cache
 
-        # inference.py lives at repo root (one level up from server/)
         script_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             "inference.py",
@@ -225,7 +287,6 @@ async def run_baseline(force: bool = False):
 def main():
     """
     CLI entry point for openenv_serve / uv run / python -m deployment modes.
-    Satisfies: openenv validate [project.scripts] + main() callable checks.
     """
     import uvicorn
     port = int(os.environ.get("PORT", 7860))

@@ -5,6 +5,7 @@ SQL Repair Environment — type-safe Pydantic models.
 from typing import Any, Dict, List, Optional
 from openenv.core.env_server.types import Action, Observation, State
 
+
 class SQLRepairAction(Action):
     """Action for the SQL Repair environment."""
     action_type: str = ""
@@ -25,8 +26,8 @@ class SQLRepairObservation(Observation):
     task_id: str = ""
     task_description: str = ""
     broken_query: str = ""
-    
-    # --- MISSING FIELDS ADDED BELOW ---
+
+    # --- RFC 002 fields ---
     done: bool = False
     reward: float = 0.0
 
@@ -36,3 +37,5 @@ class SQLRepairState(State):
     episode_id: str
     task_id: str = ""
     step_count: int = 0
+    injected_fault_count: int = 0
+    difficulty_level: int = 2

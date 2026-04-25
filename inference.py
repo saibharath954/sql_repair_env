@@ -35,9 +35,10 @@ from openai import OpenAI
 # ─── environment variables (hackathon spec) ───────────────────────────────────
 API_BASE_URL = os.environ.get(
     "API_BASE_URL",
-    "https://generativelanguage.googleapis.com/v1beta/openai/"
+    "https://router.huggingface.co/v1/"
 )
-MODEL_NAME = os.environ.get("MODEL_NAME", "gemini-2.5-flash")
+# Default to the HF model you will use for baseline evaluations
+MODEL_NAME = os.environ.get("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 HF_TOKEN   = os.environ.get("HF_TOKEN", "")
 BASE_URL   = os.environ.get("BASE_URL", "http://localhost:7860").rstrip("/")
 MAX_STEPS  = 18
