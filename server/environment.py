@@ -154,12 +154,17 @@ class SQLRepairEnvironment(Environment):
 
         obs = self._dispatch(action)
 
-        # ── grader score after this action ────────────────────────────────
+        # Threading the submitted SQL through to the grader lets a single
+        # submit_query satisfy the single-shot-only sub-goals (CAST detection
+        # for hard, schema_inspected for medium, etc.).
+        submitted_sql = action.sql_query if (action.action_type or "").lower() == "submit_query" else None
+
         score, self._achieved_flags = compute_score(
             conn=self._conn,
             task_id=self._task_id,
             last_result=obs.query_result,
             achieved_flags=self._achieved_flags,
+            submitted_sql=submitted_sql,
         )
         current_potential = compute_potential(self._achieved_flags, self._task_id)
 
@@ -324,6 +329,7 @@ class SQLRepairEnvironment(Environment):
                 task_id=self._task_id,
                 last_result=rows,
                 achieved_flags=dict(self._achieved_flags),
+                submitted_sql=correct_sql,
             )
             breakdown = {k: "✓" if v else "✗" for k, v in flags.items()}
             return SQLRepairObservation(
@@ -353,6 +359,7 @@ class SQLRepairEnvironment(Environment):
                 task_id=self._task_id,
                 last_result=[],
                 achieved_flags=dict(self._achieved_flags),
+                submitted_sql=None,
             )
             return score
 

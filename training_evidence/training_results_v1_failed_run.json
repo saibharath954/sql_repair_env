@@ -1,0 +1,33 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "base_url": "https://bharath1675-sql-repair-env.hf.space",
+  "baseline_score": 0.32520000000000004,
+  "trained_score": 0.3153,
+  "improvement": -0.00990000000000002,
+  "baseline_scores": [
+    0.675,
+    0.001,
+    0.405,
+    0.45,
+    0.001,
+    0.135,
+    0.45,
+    0.001,
+    0.135,
+    0.999
+  ],
+  "trained_scores": [
+    0.675,
+    0.001,
+    0.27,
+    0.675,
+    0.001,
+    0.135,
+    0.45,
+    0.001,
+    0.27,
+    0.675
+  ],
+  "num_train_prompts": 200,
+  "train_logged_steps": 20
+}

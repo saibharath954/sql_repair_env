@@ -1,0 +1,779 @@
+{
+  "untrained": {
+    "policy": "untrained",
+    "n_episodes": 30,
+    "mean_composite": 0.0643333333333333,
+    "mean_env": 0.0010000000000000007,
+    "success_rate_env_ge_0.5": 0.0,
+    "per_task_composite": {
+      "easy": 0.071,
+      "medium": 0.071,
+      "hard": 0.051000000000000004
+    },
+    "per_task_env": {
+      "easy": 0.0010000000000000002,
+      "medium": 0.0010000000000000002,
+      "hard": 0.0010000000000000002
+    },
+    "raw_rows": [
+      {
+        "task_id": "easy",
+        "seed": 9000,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9001,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9002,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9003,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9004,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9005,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9006,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9007,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9008,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9009,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10000,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10001,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10002,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10003,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10004,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10005,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10006,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10007,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10008,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10009,
+        "env_score": 0.001,
+        "fmt_bonus": 0.07,
+        "exec_bonus": 0.0,
+        "composite": 0.07100000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11000,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11001,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11002,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11003,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11004,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11005,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11006,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11007,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11008,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      },
+      {
+        "task_id": "hard",
+        "seed": 11009,
+        "env_score": 0.001,
+        "fmt_bonus": 0.05,
+        "exec_bonus": 0.0,
+        "composite": 0.051000000000000004
+      }
+    ]
+  },
+  "sft_warmed": {
+    "policy": "sft_warmed",
+    "n_episodes": 30,
+    "mean_composite": 0.6513333333333331,
+    "mean_env": 0.4679999999999999,
+    "success_rate_env_ge_0.5": 0.23333333333333334,
+    "per_task_composite": {
+      "easy": 0.6,
+      "medium": 0.9040000000000001,
+      "hard": 0.45000000000000007
+    },
+    "per_task_env": {
+      "easy": 0.45000000000000007,
+      "medium": 0.6839999999999999,
+      "hard": 0.27
+    },
+    "raw_rows": [
+      {
+        "task_id": "easy",
+        "seed": 9000,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9001,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9002,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9003,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9004,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9005,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9006,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9007,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9008,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9009,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10000,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10001,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10002,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10003,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10004,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10005,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10006,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10007,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10008,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10009,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11000,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11001,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11002,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11003,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11004,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11005,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11006,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11007,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11008,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      },
+      {
+        "task_id": "hard",
+        "seed": 11009,
+        "env_score": 0.27,
+        "fmt_bonus": 0.13,
+        "exec_bonus": 0.05,
+        "composite": 0.45
+      }
+    ]
+  },
+  "grpo_trained": {
+    "policy": "grpo_trained",
+    "n_episodes": 30,
+    "mean_composite": 0.8954000000000003,
+    "mean_env": 0.6954000000000001,
+    "success_rate_env_ge_0.5": 0.7,
+    "per_task_composite": {
+      "easy": 0.7872000000000001,
+      "medium": 0.9040000000000001,
+      "hard": 0.9950000000000003
+    },
+    "per_task_env": {
+      "easy": 0.6372,
+      "medium": 0.6839999999999999,
+      "hard": 0.7649999999999999
+    },
+    "raw_rows": [
+      {
+        "task_id": "easy",
+        "seed": 9000,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9001,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9002,
+        "env_score": 0.999,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 1.149
+      },
+      {
+        "task_id": "easy",
+        "seed": 9003,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9004,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9005,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9006,
+        "env_score": 0.45,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.6000000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9007,
+        "env_score": 0.675,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 0.8250000000000001
+      },
+      {
+        "task_id": "easy",
+        "seed": 9008,
+        "env_score": 0.999,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 1.149
+      },
+      {
+        "task_id": "easy",
+        "seed": 9009,
+        "env_score": 0.999,
+        "fmt_bonus": 0.1,
+        "exec_bonus": 0.05,
+        "composite": 1.149
+      },
+      {
+        "task_id": "medium",
+        "seed": 10000,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10001,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10002,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10003,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10004,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10005,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10006,
+        "env_score": 0.495,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.7150000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10007,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10008,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "medium",
+        "seed": 10009,
+        "env_score": 0.765,
+        "fmt_bonus": 0.17,
+        "exec_bonus": 0.05,
+        "composite": 0.9850000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11000,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11001,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11002,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11003,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11004,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11005,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11006,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11007,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11008,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      },
+      {
+        "task_id": "hard",
+        "seed": 11009,
+        "env_score": 0.765,
+        "fmt_bonus": 0.18000000000000002,
+        "exec_bonus": 0.05,
+        "composite": 0.9950000000000001
+      }
+    ]
+  }
+}

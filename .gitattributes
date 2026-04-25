@@ -268,3 +268,5 @@ venv/lib64/python3.10/site-packages/setuptools/gui-arm64.exe filter=lfs diff=lfs
 venv/lib64/python3.10/site-packages/uvloop/loop.cpython-310-x86_64-linux-gnu.so filter=lfs diff=lfs merge=lfs -text
 venv/lib64/python3.10/site-packages/watchfiles/_rust_notify.cpython-310-x86_64-linux-gnu.so filter=lfs diff=lfs merge=lfs -text
 venv/lib64/python3.10/site-packages/yaml/_yaml.cpython-310-x86_64-linux-gnu.so filter=lfs diff=lfs merge=lfs -text
+training_evidence/training_loss_curve.png filter=lfs diff=lfs merge=lfs -text
+training_evidence/training_reward_curve.png filter=lfs diff=lfs merge=lfs -text
