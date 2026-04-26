@@ -348,7 +348,7 @@ The environment is live on Hugging Face Spaces:
 
 🔗 **GitHub**: [saibharath954/sql_repair_env](https://github.com/saibharath954/sql_repair_env)
 
-🔗 **Training Notebook**: [`train_grpo.ipynb`](train_grpo.ipynb) — re-run the entire pipeline in ~30 min on a free Colab T4
+🔗 **Training Notebook**: [Google Colab](https://colab.research.google.com/drive/1HLs3p51pB5Us4-tONLkQtfIzH1V2ugp7?usp=sharing) — re-run the entire pipeline in ~30 min on a free Colab T4
 
 🔗 **Trained Adapters**: [bharath1675/sql-repair-grpo-qwen](https://huggingface.co/bharath1675/sql-repair-grpo-qwen) on Hugging Face Hub
 

@@ -19,7 +19,7 @@ tags:
 
 > Train an agent that can handle your 3 AM database incidents — syntax errors, broken JOINs, type mismatches, duplicate rows, and orphaned foreign keys — all randomly combined.
 
-🔗 **Live Demo**: [bharath1675/sql-repair-env](https://huggingface.co/spaces/bharath1675/sql-repair-env) &nbsp;|&nbsp; 📓 **Training Notebook**: [`train_grpo.ipynb`](train_grpo.ipynb) &nbsp;|&nbsp; 📖 **Blog Post**: [`Blog.md`](Blog.md) &nbsp;|&nbsp; 🧬 **Trained Model**: [bharath1675/sql-repair-grpo-qwen](https://huggingface.co/bharath1675/sql-repair-grpo-qwen)
+🔗 **Live Demo**: [bharath1675/sql-repair-env](https://huggingface.co/spaces/bharath1675/sql-repair-env) &nbsp;|&nbsp; 📓 **Training Notebook**: [Google Colab](https://colab.research.google.com/drive/1HLs3p51pB5Us4-tONLkQtfIzH1V2ugp7?usp=sharing) &nbsp;|&nbsp; 📖 **Blog Post**: [`Blog.md`](Blog.md) &nbsp;|&nbsp; 🧬 **Trained Model**: [bharath1675/sql-repair-grpo-qwen](https://huggingface.co/bharath1675/sql-repair-grpo-qwen)
 
 ---
 
@@ -184,7 +184,7 @@ curl http://localhost:7860/health
 
 ```bash
 export API_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai/"
-export MODEL_NAME="gemini-2.5-flash"
+export MODEL_NAME="Qwen/Qwen2.5-72B-Instruct"
 export HF_TOKEN="your_api_key"
 export BASE_URL="http://localhost:7860"
 python inference.py
@@ -192,7 +192,7 @@ python inference.py
 
 ### Re-run Training
 
-Open [`train_grpo.ipynb`](train_grpo.ipynb) in Google Colab (free T4 GPU). The full SFT + GRPO pipeline runs in ~30 minutes and saves adapters to Google Drive + Hugging Face Hub.
+Open the notebook in [Google Colab](https://colab.research.google.com/drive/1HLs3p51pB5Us4-tONLkQtfIzH1V2ugp7?usp=sharing) (free T4 GPU). The full SFT + GRPO pipeline runs in ~30 minutes and saves adapters to Google Drive + Hugging Face Hub.
 
 ---
 
