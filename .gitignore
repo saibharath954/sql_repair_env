@@ -31,3 +31,6 @@ Thumbs.db
 .coverage
 htmlcov/venv/
 script.py
+venv/
+__pycache__/
+*.safetensors
